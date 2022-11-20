@@ -1,0 +1,15 @@
+---
+title: "Homework 6"
+author: "Hongjie Liu"
+output: github_document
+---
+
+
+Load necessary packages for homework 6.
+
+```{r loadpackages, message = FALSE}
+library(tidyverse)
+```
+
+
+## Problem 1
