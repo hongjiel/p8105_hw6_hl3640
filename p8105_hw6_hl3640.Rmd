@@ -33,7 +33,7 @@ weather_df =
 
 ## Problem 2
 
-Load the dataset. Create a `city_state` variable and a binary variable indicating whether the homicide is solved. Omit cities Dallas, TX; Phoenix, AZ; and Kansas City, MO – these don’t report victim race. Also omit Tulsa, AL – this is a data entry mistake. We limit our analysis those for whom `victim_race` is `white` or `black`.
+Load the dataset. We create a `city_state` variable and a binary variable indicating whether the homicide is solved. We omit cities Dallas, TX; Phoenix, AZ; and Kansas City, MO – these don’t report victim race. We also omit Tulsa, AL – this is a data entry mistake. We limit our analysis those for whom `victim_race` is `white` or `black`.
 
 ```{r p2_readtidy, message = FALSE}
 homicide_df =
@@ -43,6 +43,35 @@ homicide_df =
     !(city_state %in% c("Dallas, TX", "Phoenix, AZ", "Kansas City, MO", "Tulsa, AL")),
     victim_race %in% c("White", "Black")
   ) %>% 
-  mutate(victim_age = as.numeric(victim_age))
+  mutate(
+    solved = ifelse(disposition %in% c("Closed without arrest", "Open/No arrest"), FALSE, TRUE),
+    victim_age = as.numeric(victim_age),
+    victim_sex = ifelse(victim_sex == "Unknown", NA, victim_sex),
+    victim_sex = as.factor(victim_sex),
+    victim_race = as.factor(victim_race)
+  )
+```
+
+For the city of Baltimore, MD, we use the `glm` function to fit a logistic regression with resolved vs unresolved as the outcome and victim age, sex and race as predictors. We save the output of `glm` as an R object; apply the `broom::tidy` to this object; and obtain the estimate and 95% confidence interval of the adjusted odds ratio for solving homicides comparing male victims to female victims keeping all other variables fixed.
+
+```{r p2_regression}
+baltimore_fit =
+  homicide_df %>% 
+  filter(city_state == "Baltimore, MD") %>% 
+  glm(solved ~ victim_age + victim_sex + victim_race, data = .)
+
+baltimore_fit %>% 
+  broom::tidy() %>% 
+  filter(term == "victim_sexMale") %>% 
+  mutate(
+    aor_estimate = exp(estimate),
+    aor_low = exp(estimate - qnorm(.975) * std.error),
+    aor_high = exp(estimate + qnorm(.975) * std.error)
+  ) %>% 
+  select(aor_estimate, aor_low, aor_high) %>% 
+  knitr::kable(
+    col.names = c("Estimate", "Lower bound of the 95% CI", "Upper bound of the 95% CI"),
+    digits = 3
+  )
 ```
 
