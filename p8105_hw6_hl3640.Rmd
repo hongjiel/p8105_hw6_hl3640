@@ -58,20 +58,43 @@ For the city of Baltimore, MD, we use the `glm` function to fit a logistic regre
 baltimore_fit =
   homicide_df %>% 
   filter(city_state == "Baltimore, MD") %>% 
-  glm(solved ~ victim_age + victim_sex + victim_race, data = .)
+  glm(solved ~ victim_age + victim_sex + victim_race, data = ., family = binomial())
 
 baltimore_fit %>% 
   broom::tidy() %>% 
   filter(term == "victim_sexMale") %>% 
   mutate(
-    aor_estimate = exp(estimate),
-    aor_low = exp(estimate - qnorm(.975) * std.error),
-    aor_high = exp(estimate + qnorm(.975) * std.error)
+    adjusted_OR_estimate = exp(estimate),
+    adjusted_OR_low = exp(estimate + qnorm(.025) * std.error),
+    adjusted_OR_high = exp(estimate + qnorm(.975) * std.error)
   ) %>% 
-  select(aor_estimate, aor_low, aor_high) %>% 
+  select(adjusted_OR_estimate, adjusted_OR_low, adjusted_OR_high) %>% 
   knitr::kable(
     col.names = c("Estimate", "Lower bound of the 95% CI", "Upper bound of the 95% CI"),
     digits = 3
   )
+```
+
+Now we run `glm` for each of the cities in our dataset, and extract the adjusted odds ratio (and CI) for solving homicides comparing male victims to female victims. Do this within a “tidy” pipeline, making use of `purrr::map`, list columns, and `unnest` as necessary to create a dataframe with estimated ORs and CIs for each city.
+
+```{r p2_regression_all}
+adjusted_OR_df =
+  homicide_df %>% 
+  nest(df = -city_state) %>% 
+  mutate(
+    models = map(.x = df, ~glm(solved ~ victim_age + victim_sex + victim_race, data = .x, family = binomial())),
+    results = map(models, broom::tidy)
+  ) %>% 
+  select(-df, -models) %>% 
+  unnest(results) %>% 
+  filter(term == "victim_sexMale") %>% 
+  mutate(
+    adjusted_OR_estimate = exp(estimate),
+    adjusted_OR_low = exp(estimate + qnorm(.025) * std.error),
+    adjusted_OR_high = exp(estimate + qnorm(.975) * std.error)
+  ) %>% 
+  select(city_state, adjusted_OR_estimate, adjusted_OR_low, adjusted_OR_high)
+
+adjusted_OR_df
 ```
 
