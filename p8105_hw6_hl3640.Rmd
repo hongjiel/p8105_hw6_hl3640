@@ -13,3 +13,36 @@ library(tidyverse)
 
 
 ## Problem 1
+
+Load the dataset.
+
+```{r p1_load, message = FALSE}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2017-01-01",
+    date_max = "2017-12-31") %>%
+  mutate(
+    name = recode(id, USW00094728 = "CentralPark_NY"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
+```
+
+
+## Problem 2
+
+Load the dataset. Create a `city_state` variable and a binary variable indicating whether the homicide is solved. Omit cities Dallas, TX; Phoenix, AZ; and Kansas City, MO – these don’t report victim race. Also omit Tulsa, AL – this is a data entry mistake. We limit our analysis those for whom `victim_race` is `white` or `black`.
+
+```{r p2_readtidy, message = FALSE}
+homicide_df =
+  read_csv("./data/homicide-data.csv") %>% 
+  unite(city_state, city:state, sep = ", ") %>% 
+  filter(
+    !(city_state %in% c("Dallas, TX", "Phoenix, AZ", "Kansas City, MO", "Tulsa, AL")),
+    victim_race %in% c("White", "Black")
+  ) %>% 
+  mutate(victim_age = as.numeric(victim_age))
+```
+
