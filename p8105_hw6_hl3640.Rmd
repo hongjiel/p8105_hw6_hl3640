@@ -9,6 +9,7 @@ Load necessary packages for homework 6.
 
 ```{r loadpackages, message = FALSE}
 library(tidyverse)
+library(modelr)
 ```
 
 
@@ -116,3 +117,27 @@ Comment on the plot.
 
 
 ## Problem 3
+
+Load and clean the data for regression analysis. There are no missing data in the dataframe. We find that the values of `pnumlbw` and `pnumsga` are all zeros, so we are not going to use these two variables as predictors in our regression analysis.
+
+```{r p3_loadtidy}
+birthweight_df =
+  read_csv("./data/birthweight.csv") %>% 
+  mutate(
+    babysex = as.factor(babysex),
+    frace = as.factor(frace),
+    malform = as.factor(malform),
+    mrace = as.factor(mrace)
+  ) %>% 
+  select(-pnumlbw, -pnumsga)
+```
+
+We use criterion-based procedures. We examine all possible models and choose the “best” using the Bayesian Information Criterion (BIC). We choose the model with the smallest BIC value. The predictors of our final model is `babysex`, `bhead`, `blength`, `delwt`, `frace`, `gaweeks`, `mrace`, `ppbmi`, and `smoken`.
+
+```{r p3_regression}
+lm_allsub = leaps::regsubsets(bwt ~ ., data = birthweight_df, nvmax = 21)
+
+plot(lm_allsub, scale = "bic")
+
+my_reg = lm(bwt ~ babysex + bhead + blength + delwt + frace + gaweeks + mrace + ppbmi + smoken, data = birthweight_df)
+```
