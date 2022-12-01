@@ -141,3 +141,20 @@ plot(lm_allsub, scale = "bic")
 
 my_reg = lm(bwt ~ babysex + bhead + blength + delwt + frace + gaweeks + mrace + ppbmi + smoken, data = birthweight_df)
 ```
+
+We create a plot of model residuals against fitted values.
+
+```{r p3_residuals}
+birthweight_df %>% 
+  add_predictions(my_reg) %>% 
+  add_residuals(my_reg) %>% 
+  ggplot(aes(x = pred, y = resid)) +
+  geom_point(alpha = .25) +
+  geom_smooth(se = FALSE) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  labs(
+    title = "Residuals vs Fitted",
+    x = "Fitted Values",
+    y = "Residuals"
+  )
+```
