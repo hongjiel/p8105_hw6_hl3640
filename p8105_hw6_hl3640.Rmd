@@ -200,7 +200,7 @@ adjusted_OR_df %>%
   )
 ```
 
-Comment on the plot.
+For cities whose 95% CI excludes 1, we have sufficient evidence that the odds of solving homicides among male victims are higher than the odds of solving homicides among female victims. For cities whose 95% CI contains 1, we don't have sufficient evidence that there is a difference between the odds of solving homicides among male victims and the odds of solving homicides among female victims.
 
 
 ## Problem 3
