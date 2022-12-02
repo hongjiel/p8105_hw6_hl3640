@@ -90,6 +90,34 @@ bootstrap_results %>%
 
 We find that both estimates are roughly normally distributed.
 
+We identify the 2.5% and 97.5% quantiles to provide a 95% confidence interval for $\hat{r} ^ 2$ and $\log (\beta_0 \cdot \beta_1)$.
+
+```{r p1_ci}
+bootstrap_results %>% 
+  select(adj_r_squared) %>% 
+  summarize(
+    lower_bound = quantile(adj_r_squared, .025),
+    upper_bound = quantile(adj_r_squared, .975)
+  ) %>% 
+  knitr::kable(
+    caption = "Adjusted R-squared",
+    col.names = c("Lower Bound of 95% CI", "Upper Bound of 95% CI"),
+    digits = 3
+  )
+
+bootstrap_results %>% 
+  select(log_estimate) %>% 
+  summarize(
+    lower_bound = quantile(log_estimate, .025),
+    upper_bound = quantile(log_estimate, .975)
+  ) %>% 
+  knitr::kable(
+    caption = "Natural Log of beta_0*beta_1",
+    col.names = c("Lower Bound of 95% CI", "Upper Bound of 95% CI"),
+    digits = 3
+  )
+```
+
 
 ## Problem 2
 
