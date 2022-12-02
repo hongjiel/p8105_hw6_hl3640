@@ -36,6 +36,8 @@ We use 5000 bootstrap samples and, for each bootstrap sample, produce estimates 
 ```{r p1_bootstrap, warning = FALSE}
 weather_df = select(weather_df, tmin, tmax)
 
+set.seed(3640)
+
 boot_sample = function(df) {
   sample_frac(df, replace = TRUE)
 }
@@ -64,6 +66,29 @@ bootstrap_results =
 bootstrap_results
 ```
 
+We plot the distribution of the estimates.
+
+```{r p1_plot1}
+bootstrap_results %>% 
+  ggplot(aes(x = adj_r_squared)) +
+  geom_density() +
+  labs(
+    title = "Distribution of the estimates of Adjusted R-squared",
+    x = "Estimates",
+    y = "Density"
+  )
+
+bootstrap_results %>% 
+  ggplot(aes(x = log_estimate)) +
+  geom_density() +
+  labs(
+    title = "Distribution of the estimates of log(beta_0*beta_1)",
+    x = "Estimates",
+    y = "Density"
+  )
+```
+
+We find that both estimates are roughly normally distributed.
 
 
 ## Problem 2
