@@ -284,3 +284,5 @@ cv_df %>%
   ggplot(aes(x = model, y = rmse)) +
   geom_boxplot()
 ```
+
+From the plot, my model seems to have the lowest cross-validated prediction error among the three models, and model B has significantly lower prediction error compared to model A. I will choose my model as the final model in terms of goodness of fit. However, we need to further investigate whether there are any violations of assumptions regarding the residuals vs. fitted values plot.
